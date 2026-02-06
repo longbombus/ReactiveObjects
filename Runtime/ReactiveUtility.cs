@@ -38,5 +38,59 @@ namespace ReactiveObjects
 		}
 
 		#endregion
+
+		#region ListenOnce
+
+		public static Listening ListenOnce(this IReactive reactive, Action listener)
+		{
+			return Listening.Create(reactive, Wrapper);
+			void Wrapper()
+			{
+				reactive.Forget(Wrapper);
+				listener.InvokeSafe();
+			}
+		}
+
+		public static Listening ListenOnce<TValue>(this IReadOnlyReactive<TValue> reactive, Action<TValue> listener)
+		{
+			return Listening.Create(reactive, Wrapper);
+			void Wrapper(TValue value)
+			{
+				reactive.Forget(Wrapper);
+				listener.InvokeSafe(value);
+			}
+		}
+
+		public static Listening ListenOnce<TKey, TValue>(IReactive<TKey, TValue> reactive, Action<TKey, TValue> listener)
+		{
+			return Listening.Create(reactive, Wrapper);
+			void Wrapper(TKey key, TValue value)
+			{
+				reactive.Forget(Wrapper);
+				listener.InvokeSafe(key, value);
+			}
+		}
+
+		public static Listening ListenOnce<TKey, TValue>(this IReadOnlyReactive<TKey, TValue> reactive, TKey key, Action listener)
+		{
+			return Listening.Create(reactive, key, Wrapper);
+			void Wrapper()
+			{
+				reactive.Forget(key, Wrapper);
+				listener.InvokeSafe();
+			}
+		}
+
+		public static Listening ListenOnce<TKey, TValue>(this IReadOnlyReactive<TKey, TValue> reactive, TKey key, Action<TValue> listener)
+		{
+			return Listening.Create(reactive, key, Wrapper);
+			void Wrapper(TValue value)
+			{
+				reactive.Forget(key, Wrapper);
+				listener.InvokeSafe(value);
+			}
+		}
+
+		#endregion
 	}
 }
