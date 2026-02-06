@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace ReactiveObjects
 {
@@ -31,9 +32,8 @@ namespace ReactiveObjects
 		TValue Value { get; }
 	}
 
-	public interface IReadOnlyReactive<TKey, out TValue> : IReactive<TKey, TValue>
+	public interface IReadOnlyReactive<TKey, TValue> : IReactive<TKey, TValue>, IReadOnlyDictionary<TKey, TValue>
 	{
-		TValue this[TKey key] { get; }
 	}
 
 	public interface IReadWriteReactive<TValue> : IReactive<TValue>
@@ -41,8 +41,7 @@ namespace ReactiveObjects
 		TValue Value { get; set; }
 	}
 
-	public interface IReadWriteReactive<TKey, TValue> : IReactive<TKey, TValue>
+	public interface IReadWriteReactive<TKey, TValue> : IReactive<TKey, TValue>, IDictionary<TKey, TValue>
 	{
-		TValue this[TKey key] { get; set; }
 	}
 }

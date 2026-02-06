@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace ReactiveObjects
@@ -13,7 +14,29 @@ namespace ReactiveObjects
 		private Dictionary<TKey, List<Action<TValue>>> keyedValueListeners;
 
 		private readonly Dictionary<TKey, TValue> map;
-		private readonly EqualityComparer<TValue> comparer;
+		private readonly EqualityComparer<TValue> valueComparer;
+
+		public bool IsReadOnly => false;
+		public int Count => map.Count;
+
+		public IReadOnlyCollection<TKey> Keys => map.Keys;
+		IEnumerable<TKey> IReadOnlyDictionary<TKey, TValue>.Keys => map.Keys;
+		IEnumerable<TValue> IReadOnlyDictionary<TKey, TValue>.Values => map.Values;
+
+		public IReadOnlyCollection<TValue> Values => map.Values;
+		ICollection<TKey> IDictionary<TKey, TValue>.Keys => map.Keys;
+		ICollection<TValue> IDictionary<TKey, TValue>.Values => map.Values;
+
+		public Reactive() : this(0, null, null) { }
+		public Reactive(IEqualityComparer<TKey> keyComparer) : this(0, keyComparer, null) { }
+		public Reactive(EqualityComparer<TValue> valueComparer) : this(0, null, valueComparer) { }
+		public Reactive(IEqualityComparer<TKey> keyComparer, EqualityComparer<TValue> valueComparer) : this(0, keyComparer, valueComparer) { }
+
+		public Reactive(int capacity, IEqualityComparer<TKey> keyComparer = null, EqualityComparer<TValue> valueComparer = null)
+		{
+			map = new Dictionary<TKey, TValue>(capacity, keyComparer);
+			this.valueComparer = valueComparer ?? EqualityComparer<TValue>.Default;
+		}
 
 		public TValue this[TKey key]
 		{
@@ -23,7 +46,7 @@ namespace ReactiveObjects
 
 		public void Set(TKey key, TValue value)
 		{
-			if (map.TryGetValue(key, out var oldValue) && comparer.Equals(oldValue, value))
+			if (map.TryGetValue(key, out var oldValue) && valueComparer.Equals(oldValue, value))
 				return;
 
 			map[key] = value;
@@ -61,5 +84,52 @@ namespace ReactiveObjects
 			ListenersUtility.InvokeAllSafe(keyedChangeListeners, key);
 			ListenersUtility.InvokeAllSafe(keyedValueListeners, key, value);
 		}
+
+		public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
+			=> map.GetEnumerator();
+
+		IEnumerator IEnumerable.GetEnumerator()
+			=> map.GetEnumerator();
+
+		public bool TryGetValue(TKey key, out TValue value)
+			=> map.TryGetValue(key, out value);
+
+		public bool ContainsKey(TKey key)
+			=> map.ContainsKey(key);
+
+		bool ICollection<KeyValuePair<TKey, TValue>>.Contains(KeyValuePair<TKey, TValue> item)
+			=> ((ICollection<KeyValuePair<TKey, TValue>>)map).Contains(item);
+
+		public void Add(TKey key, TValue value)
+		{
+			map.Add(key, value);
+			Notify(key, value);
+		}
+
+		void ICollection<KeyValuePair<TKey, TValue>>.Add(KeyValuePair<TKey, TValue> item)
+			=> Add(item.Key, item.Value);
+
+		public bool Remove(TKey key)
+		{
+			if (!map.Remove(key))
+				return false;
+
+			Notify(key, default);
+			return true;
+		}
+
+		bool ICollection<KeyValuePair<TKey, TValue>>.Remove(KeyValuePair<TKey, TValue> item)
+			=> Remove(item.Key);
+
+		public void Clear()
+		{
+			foreach (var key in map.Keys)
+				Notify(key, default);
+
+			map.Clear();
+		}
+
+		void ICollection<KeyValuePair<TKey, TValue>>.CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
+			=> ((ICollection<KeyValuePair<TKey, TValue>>)map).CopyTo(array, arrayIndex);
 	}
 }
