@@ -18,6 +18,12 @@ namespace ReactiveObjects
 			listener.InvokeSafe(reactive.Value);
 		}
 
+		public static void ListenNow<TKey, TValue>(this IReadOnlyReactive<TKey, TValue> reactive, Action listener)
+		{
+			reactive.Listen(listener);
+			listener.InvokeSafe();
+		}
+
 		public static void ListenNow<TKey, TValue>(this IReadOnlyReactive<TKey, TValue> reactive, Action<TKey, TValue> listener)
 		{
 			reactive.Listen(listener);
@@ -58,6 +64,16 @@ namespace ReactiveObjects
 			{
 				reactive.Forget(Wrapper);
 				listener.InvokeSafe(value);
+			}
+		}
+
+		public static Listening ListenOnce<TKey, TValue>(IReactive<TKey, TValue> reactive, Action listener)
+		{
+			return Listening.Create(reactive, Wrapper);
+			void Wrapper(TKey key, TValue value)
+			{
+				reactive.Forget(Wrapper);
+				listener.InvokeSafe();
 			}
 		}
 
