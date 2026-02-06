@@ -8,6 +8,31 @@ namespace ReactiveObjects
 {
 	public static class ListenersUtility
 	{
+		#region Invokation
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static void InvokeSafe(this Action listener)
+		{
+			try { listener(); }
+			catch (Exception e) { Debug.LogException(e); }
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static void InvokeSafe<TValue>(this Action<TValue> listener, TValue value)
+		{
+			try { listener.Invoke(value); }
+			catch (Exception e) { Debug.LogException(e); }
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static void InvokeSafe<TKey, TValue>(this Action<TKey, TValue> listener, TKey key, TValue value)
+		{
+			try { listener.Invoke(key, value); }
+			catch (Exception e) { Debug.LogException(e); }
+		}
+
+		#endregion
+
 		#region Change listeners
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -29,8 +54,7 @@ namespace ReactiveObjects
 			listeners.CopyTo(cachedListeners, listenersCount);
 
 			for (var i = 0; i < listenersCount; ++i)
-				try { cachedListeners[i](); }
-				catch (Exception e) { Debug.LogException(e); }
+				cachedListeners[i].InvokeSafe();
 
 			ArrayPool<Action>.Shared.Return(cachedListeners);
 		}
@@ -58,8 +82,7 @@ namespace ReactiveObjects
 			listeners.CopyTo(cachedListeners, listenersCount);
 
 			for (var i = 0; i < listenersCount; ++i)
-				try { cachedListeners[i].Invoke(value); }
-				catch (Exception e) { Debug.LogException(e); }
+				cachedListeners[i].InvokeSafe(value);
 
 			ArrayPool<Action<TValue>>.Shared.Return(cachedListeners);
 		}
@@ -87,8 +110,7 @@ namespace ReactiveObjects
 			listeners.CopyTo(cachedListeners, listenersCount);
 
 			for (var i = 0; i < listenersCount; ++i)
-				try { cachedListeners[i].Invoke(key, value); }
-				catch (Exception e) { Debug.LogException(e); }
+				cachedListeners[i].InvokeSafe(key, value);
 
 			ArrayPool<Action<TKey, TValue>>.Shared.Return(cachedListeners);
 		}
