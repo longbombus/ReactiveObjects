@@ -1,0 +1,17 @@
+{
+  "name": "com.longbombus.reactiveobjects",
+  "displayName": "Reactive Objects",
+  "version": "0.0.1",
+  "description": "Reactive Variables and Collections for Unity with safe invocation.",
+  "keywords": [
+    "reactive",
+    "rx",
+    "events",
+    "subscriber",
+    "publisher",
+    "observer",
+    "observable"
+  ],
+  "license": "MIT",
+  "category": "Utilities"
+}
