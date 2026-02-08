@@ -6,6 +6,7 @@ using UnityEngine;
 
 namespace ReactiveObjects
 {
+	/// <summary> Stuff to work with listeners in implementations of Reactive objects. </summary>
 	public static class ListenersUtility
 	{
 		#region Invokation

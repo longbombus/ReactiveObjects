@@ -5,7 +5,7 @@ namespace ReactiveObjects
 {
 	public static class ReactiveUtility
 	{
-		#region ListenNow
+		#region Now
 
 		/// <summary> Subscribes on change and immediately invokes listener. </summary>
 		public static void ListenNow(this IReactive reactive, Action listener)
@@ -50,14 +50,63 @@ namespace ReactiveObjects
 			listener.InvokeSafe(reactive[key]);
 		}
 
+		/// <inheritdoc cref="ListenNow(IReactive, Action)"/>
+		public static Reaction ReactNow(this IReactive reactive, Action listener)
+		{
+			var result = Reaction.Create(reactive, listener);
+			listener.InvokeSafe();
+			return result;
+		}
+
+		/// <inheritdoc cref="ListenNow{TValue}(IReadOnlyReactive{TValue}, Action{TValue})"/>
+		public static Reaction ReactNow<TValue>(this IReadOnlyReactive<TValue> reactive, Action<TValue> listener)
+		{
+			var result = Reaction.Create(reactive, listener);
+			listener.InvokeSafe(reactive.Value);
+			return result;
+		}
+
+		/// <inheritdoc cref="ListenNow{TKey, TValue}(IReadOnlyReactive{TKey, TValue}, Action)"/>
+		public static Reaction ReactNow<TKey, TValue>(this IReadOnlyReactive<TKey, TValue> reactive, Action listener)
+		{
+			var result = Reaction.Create(reactive, listener);
+			listener.InvokeSafe();
+			return result;
+		}
+
+		/// <inheritdoc cref="ListenNow{TKey, TValue}(IReadOnlyReactive{TKey, TValue}, Action{TKey, TValue})"/>
+		public static Reaction ReactNow<TKey, TValue>(this IReadOnlyReactive<TKey, TValue> reactive, Action<TKey, TValue> listener)
+		{
+			var result = Reaction.Create(reactive, listener);
+			foreach (var (key, value) in reactive)
+				listener.InvokeSafe(key, value);
+			return result;
+		}
+
+		/// <inheritdoc cref="ListenNow{TKey, TValue}(IReadOnlyReactive{TKey, TValue}, TKey, Action)"/>
+		public static Reaction ReactNow<TKey, TValue>(this IReadOnlyReactive<TKey, TValue> reactive, TKey key, Action listener)
+		{
+			var result = Reaction.Create(reactive, key, listener);
+			listener.InvokeSafe();
+			return result;
+		}
+
+		/// <inheritdoc cref="ListenNow{TKey, TValue}(IReadOnlyReactive{TKey, TValue}, TKey, Action{TValue})"/>
+		public static Reaction ReactNow<TKey, TValue>(this IReadOnlyReactive<TKey, TValue> reactive, TKey key, Action<TValue> listener)
+		{
+			var result = Reaction.Create(reactive, key, listener);
+			listener.InvokeSafe(reactive[key]);
+			return result;
+		}
+
 		#endregion
 
-		#region ListenOnce
+		#region Once
 
 		/// <summary> Subscribes on only single next change. </summary>
-		public static Listening ListenOnce(this IReactive reactive, Action listener)
+		public static Reaction ReactOnce(this IReactive reactive, Action listener)
 		{
-			return Listening.Create(reactive, Wrapper);
+			return Reaction.Create(reactive, Wrapper);
 			void Wrapper()
 			{
 				reactive.Forget(Wrapper);
@@ -66,9 +115,9 @@ namespace ReactiveObjects
 		}
 
 		/// <summary> Subscribes on only single next value change. </summary>
-		public static Listening ListenOnce<TValue>(this IReadOnlyReactive<TValue> reactive, Action<TValue> listener)
+		public static Reaction ReactOnce<TValue>(this IReadOnlyReactive<TValue> reactive, Action<TValue> listener)
 		{
-			return Listening.Create(reactive, Wrapper);
+			return Reaction.Create(reactive, Wrapper);
 			void Wrapper(TValue value)
 			{
 				reactive.Forget(Wrapper);
@@ -77,9 +126,9 @@ namespace ReactiveObjects
 		}
 
 		/// <summary> Subscribes on only single next change of any key. </summary>
-		public static Listening ListenOnce<TKey, TValue>(IReactive<TKey, TValue> reactive, Action listener)
+		public static Reaction ReactOnce<TKey, TValue>(IReactive<TKey, TValue> reactive, Action listener)
 		{
-			return Listening.Create(reactive, Wrapper);
+			return Reaction.Create(reactive, Wrapper);
 			void Wrapper(TKey key, TValue value)
 			{
 				reactive.Forget(Wrapper);
@@ -88,9 +137,9 @@ namespace ReactiveObjects
 		}
 
 		/// <summary> Subscribes on only single next value change of any key. </summary>
-		public static Listening ListenOnce<TKey, TValue>(IReactive<TKey, TValue> reactive, Action<TKey, TValue> listener)
+		public static Reaction ReactOnce<TKey, TValue>(IReactive<TKey, TValue> reactive, Action<TKey, TValue> listener)
 		{
-			return Listening.Create(reactive, Wrapper);
+			return Reaction.Create(reactive, Wrapper);
 			void Wrapper(TKey key, TValue value)
 			{
 				reactive.Forget(Wrapper);
@@ -99,9 +148,9 @@ namespace ReactiveObjects
 		}
 
 		/// <summary> Subscribes on only single next change of specific key. </summary>
-		public static Listening ListenOnce<TKey, TValue>(this IReadOnlyReactive<TKey, TValue> reactive, TKey key, Action listener)
+		public static Reaction ReactOnce<TKey, TValue>(this IReadOnlyReactive<TKey, TValue> reactive, TKey key, Action listener)
 		{
-			return Listening.Create(reactive, key, Wrapper);
+			return Reaction.Create(reactive, key, Wrapper);
 			void Wrapper()
 			{
 				reactive.Forget(key, Wrapper);
@@ -110,9 +159,9 @@ namespace ReactiveObjects
 		}
 
 		/// <summary> Subscribes on only single next value change of specific key. </summary>
-		public static Listening ListenOnce<TKey, TValue>(this IReadOnlyReactive<TKey, TValue> reactive, TKey key, Action<TValue> listener)
+		public static Reaction ReactOnce<TKey, TValue>(this IReadOnlyReactive<TKey, TValue> reactive, TKey key, Action<TValue> listener)
 		{
-			return Listening.Create(reactive, key, Wrapper);
+			return Reaction.Create(reactive, key, Wrapper);
 			void Wrapper(TValue value)
 			{
 				reactive.Forget(key, Wrapper);
@@ -122,24 +171,24 @@ namespace ReactiveObjects
 
 		#endregion
 
-		#region Listenings Collections
+		#region Reactions Collections
 
 		/// <summary> Forget all listenings and clears collection. </summary>
-		public static void ForgetAll(this ICollection<Listening> listenings)
+		public static void ForgetAll(this ICollection<Reaction> reactions)
 		{
-			foreach (var listening in listenings)
+			foreach (var listening in reactions)
 				listening.Forget();
 
-			listenings.Clear();
+			reactions.Clear();
 		}
 
 		 /// <summary> Forget all listenings and clears dictionary. </summary>
-		public static void ForgetAll<TKey>(this IDictionary<TKey, Listening> listenings)
+		public static void ForgetAll<TKey>(this IDictionary<TKey, Reaction> reactions)
 		{
-			foreach (var listening in listenings.Values)
+			foreach (var listening in reactions.Values)
 				listening.Forget();
 
-			listenings.Clear();
+			reactions.Clear();
 		}
 
 		#endregion
