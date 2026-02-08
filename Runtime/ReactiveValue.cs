@@ -3,6 +3,8 @@ using System.Collections.Generic;
 
 namespace ReactiveObjects
 {
+	/// <summary> Implementation of listenable value. You can use it as a field or property type to make it listenable. </summary>
+	/// <typeparam name="T"> Type of the changeable value. Notice that reference type internal changes will not trigger listeners. </typeparam>
 	public class Reactive<T>
 		: IReadOnlyReactive<T>
 		, IReadWriteReactive<T>
@@ -27,6 +29,8 @@ namespace ReactiveObjects
 			this.comparer = comparer ?? EqualityComparer<T>.Default;
 		}
 
+		/// <summary> Changes value and notifies listeners if the value is different from the current one. </summary>
+		/// <param name="newValue"> New value to set. </param>
 		public void Set(T newValue)
 		{
 			if (comparer.Equals(value, newValue))
@@ -35,6 +39,11 @@ namespace ReactiveObjects
 			value = newValue;
 			Notify(newValue);
 		}
+
+		/// <summary> Changes value without notifying listeners. </summary>
+		/// <param name="newValue"> New value to set. </param>
+		public void SetSilent(T newValue)
+			=> value = newValue;
 
 		public void Listen(Action listener)
 			=> ListenersUtility.AddListener(ref changeListeners, listener);

@@ -4,6 +4,12 @@ using System.Collections.Generic;
 
 namespace ReactiveObjects
 {
+	/// <summary>
+	/// Reactive key-value collection.
+	/// Returns default value if key is not found.
+	/// </summary>
+	/// <typeparam name="TKey"> Type of keys. </typeparam>
+	/// <typeparam name="TValue"> Type of values. Notice that reference type internal changes will not trigger listeners. </typeparam>
 	public class Reactive<TKey, TValue>
 		: IReadOnlyReactive<TKey, TValue>
 		, IReadWriteReactive<TKey, TValue>
@@ -38,12 +44,18 @@ namespace ReactiveObjects
 			this.valueComparer = valueComparer ?? EqualityComparer<TValue>.Default;
 		}
 
+		/// <summary> Access to value according the key. </summary>
+		/// <param name="key"> Key of value to access. </param>
+		/// <returns> Value of the key or default if key is not found. </returns>
 		public TValue this[TKey key]
 		{
 			get => map.TryGetValue(key, out var value) ? value : default;
 			set => Set(key, value);
 		}
 
+		/// <summary> Changes value of the key and notifies listeners if the value is different from the current one. </summary>
+		/// <param name="key"> Key of value to change. </param>
+		/// <param name="value"> New value to set. </param>
 		public void Set(TKey key, TValue value)
 		{
 			if (map.TryGetValue(key, out var oldValue) && valueComparer.Equals(oldValue, value))
@@ -52,6 +64,12 @@ namespace ReactiveObjects
 			map[key] = value;
 			Notify(key, value);
 		}
+
+		/// <summary> Changes value of the key without notifying listeners. </summary>
+		/// <param name="key"> Key of value to change. </param>
+		/// <param name="value"> New value to set. </param>
+		public void SetSilent(TKey key, TValue value)
+			=> map[key] = value;
 
 		public void Listen(Action listener)
 			=> ListenersUtility.AddListener(ref changeListeners, listener);
