@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace ReactiveObjects
 {
@@ -117,6 +118,28 @@ namespace ReactiveObjects
 				reactive.Forget(key, Wrapper);
 				listener.InvokeSafe(value);
 			}
+		}
+
+		#endregion
+
+		#region Listenings Collections
+
+		/// <summary> Forget all listenings and clears collection. </summary>
+		public static void ForgetAll(this ICollection<Listening> listenings)
+		{
+			foreach (var listening in listenings)
+				listening.Forget();
+
+			listenings.Clear();
+		}
+
+		 /// <summary> Forget all listenings and clears dictionary. </summary>
+		public static void ForgetAll<TKey>(this IDictionary<TKey, Listening> listenings)
+		{
+			foreach (var listening in listenings.Values)
+				listening.Forget();
+
+			listenings.Clear();
 		}
 
 		#endregion

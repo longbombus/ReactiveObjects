@@ -4,6 +4,7 @@ using System;
 
 namespace ReactiveObjects
 {
+	/// <summary> Struct that preserves listening ownership. Disposing it will stop listening. </summary>
 	public readonly struct Listening : IDisposable, IEquatable<Listening>
 	{
 		private readonly Action forget;
@@ -11,7 +12,10 @@ namespace ReactiveObjects
 		private Listening(Action forget)
 			=> this.forget = forget;
 
-		public readonly void Dispose()
+		public void Forget()
+			=> forget();
+
+		void IDisposable.Dispose()
 			=> forget();
 
 		public bool Equals(Listening other)
