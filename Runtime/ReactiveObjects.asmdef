@@ -1,5 +1,5 @@
 {
-    "name": "com.longbombus.reactiveobjects",
+    "name": "ReactiveObjects",
     "rootNamespace": "ReactiveObjects",
     "references": [],
     "includePlatforms": [],
