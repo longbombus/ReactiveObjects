@@ -52,7 +52,7 @@ namespace ReactiveObjects
 
 			var listenersCount = listeners.Count;
 			var cachedListeners = ArrayPool<Action>.Shared.Rent(listenersCount);
-			listeners.CopyTo(cachedListeners, listenersCount);
+			listeners.CopyTo(cachedListeners, 0);
 
 			for (var i = 0; i < listenersCount; ++i)
 				cachedListeners[i].InvokeSafe();
@@ -80,7 +80,7 @@ namespace ReactiveObjects
 
 			var listenersCount = listeners.Count;
 			var cachedListeners = ArrayPool<Action<TValue>>.Shared.Rent(listenersCount);
-			listeners.CopyTo(cachedListeners, listenersCount);
+			listeners.CopyTo(cachedListeners, 0);
 
 			for (var i = 0; i < listenersCount; ++i)
 				cachedListeners[i].InvokeSafe(value);
@@ -108,7 +108,7 @@ namespace ReactiveObjects
 
 			var listenersCount = listeners.Count;
 			var cachedListeners = ArrayPool<Action<TKey, TValue>>.Shared.Rent(listenersCount);
-			listeners.CopyTo(cachedListeners, listenersCount);
+			listeners.CopyTo(cachedListeners, 0);
 
 			for (var i = 0; i < listenersCount; ++i)
 				cachedListeners[i].InvokeSafe(key, value);
