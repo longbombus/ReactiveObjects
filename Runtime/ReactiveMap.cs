@@ -53,6 +53,12 @@ namespace ReactiveObjects
 			set => Set(key, value);
 		}
 
+		/// <summary> Provide you access to some key as reactive value. </summary>
+		/// <param name="key"> Key to be treated as reactive. </param>
+		/// <returns> Reactive value corresponding the key. </returns>
+		public IReadWriteReactive<TValue> At(TKey key)
+			=> new ReactiveKey(this, key);
+
 		/// <summary> Changes value of the key and notifies listeners if the value is different from the current one. </summary>
 		/// <param name="key"> Key of value to change. </param>
 		/// <param name="value"> New value to set. </param>
@@ -149,5 +155,35 @@ namespace ReactiveObjects
 
 		void ICollection<KeyValuePair<TKey, TValue>>.CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
 			=> ((ICollection<KeyValuePair<TKey, TValue>>)map).CopyTo(array, arrayIndex);
+
+		private class ReactiveKey : IReadOnlyReactive<TValue>, IReadWriteReactive<TValue>
+		{
+			private readonly Reactive<TKey, TValue> map;
+			private readonly TKey key;
+
+			public TValue Value
+			{
+				get => map[key];
+				set => map[key] = value;
+			}
+
+			public ReactiveKey(Reactive<TKey, TValue> map, TKey key)
+			{
+				this.map = map;
+				this.key = key;
+			}
+
+			public void Listen(Action listener)
+				=> map.Listen(key, listener);
+
+			public void Forget(Action listener)
+				=> map.Forget(key, listener);
+
+			public void Listen(Action<TValue> listener)
+				=> map.Listen(key, listener);
+
+			public void Forget(Action<TValue> listener)
+				=> map.Forget(key, listener);
+		}
 	}
 }
