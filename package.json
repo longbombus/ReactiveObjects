@@ -13,5 +13,9 @@
     "observable"
   ],
   "license": "MIT",
-  "category": "Utilities"
+  "category": "Utilities",
+  "author": {
+    "name": "Denis Lazarev",
+    "email": "mahrizh@gmail.com"
+  }
 }
