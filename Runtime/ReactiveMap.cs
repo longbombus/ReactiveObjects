@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 
 namespace ReactiveObjects
 {
@@ -184,6 +185,19 @@ namespace ReactiveObjects
 
 			public void Forget(Action<TValue> listener)
 				=> map.Forget(key, listener);
+
+			public override string ToString()
+			{
+				if (map.Count == 0)
+					return "{}";
+
+				var result = new StringBuilder(map.Count * 128);
+				result.Append('{');
+				foreach (var (k, v) in map)
+					result.Append('"').Append(k).Append("\":\"").Append(v).Append("\",");
+				result[^1] = '}';
+				return result.ToString();
+			}
 		}
 	}
 }

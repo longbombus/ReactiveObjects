@@ -132,5 +132,11 @@ namespace ReactiveObjects
 			ListenersUtility.InvokeAllSafe(changeListeners);
 			ListenersUtility.InvokeAllSafe(nullableValueListeners, null);
 		}
+
+		public static implicit operator T?(ReactiveNullable<T> reactive)
+			=> reactive.HasValue ? reactive.Value : null;
+
+		public override string ToString()
+			=> HasValue ? Value.ToString() : "null";
 	}
 }

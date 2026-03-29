@@ -62,5 +62,11 @@ namespace ReactiveObjects
 			ListenersUtility.InvokeAllSafe(changeListeners);
 			ListenersUtility.InvokeAllSafe(valueListeners, newValue);
 		}
+
+		public static implicit operator T(Reactive<T> reactive)
+			=> reactive.Value;
+
+		public override string ToString()
+			=> Value?.ToString() ?? "null";
 	}
 }
