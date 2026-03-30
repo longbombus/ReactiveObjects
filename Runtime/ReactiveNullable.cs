@@ -69,22 +69,24 @@ namespace ReactiveObjects
 			Notify(value);
 		}
 
+		/// <summary> Nullifies value and notifies listeners if the value was not null. </summary>
+		public void SetNull()
+		{
+			if (!hasValue)
+				return;
+
+			value = default;
+			hasValue = false;
+			NotifyNull();
+		}
+
 		/// <inheritdoc cref="ReactiveNullable{T}.Set(T)"/>
 		public void Set(T? newValue)
 		{
 			if (newValue.HasValue)
-			{
 				Set(newValue.Value);
-			}
 			else
-			{
-				if (!hasValue)
-					return;
-
-				value = default;
-				hasValue = false;
-				NotifyNull();
-			}
+				SetNull();
 		}
 
 		/// <summary> Changes value without notifying listeners. </summary>
