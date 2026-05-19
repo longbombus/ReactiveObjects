@@ -11,9 +11,9 @@ namespace ReactiveObjects
 	/// </summary>
 	/// <typeparam name="TKey"> Type of keys. </typeparam>
 	/// <typeparam name="TValue"> Type of values. Notice that reference type internal changes will not trigger listeners. </typeparam>
-	public class Reactive<TKey, TValue>
-		: IReadOnlyReactive<TKey, TValue>
-		, IReadWriteReactive<TKey, TValue>
+	public class ReactiveMap<TKey, TValue>
+		: IReadOnlyReactiveMap<TKey, TValue>
+		, IDictionary<TKey, TValue>
 	{
 		private List<Action> changeListeners;
 		private List<Action<TKey, TValue>> keyValueListeners;
@@ -34,12 +34,12 @@ namespace ReactiveObjects
 		ICollection<TKey> IDictionary<TKey, TValue>.Keys => map.Keys;
 		ICollection<TValue> IDictionary<TKey, TValue>.Values => map.Values;
 
-		public Reactive() : this(0, null, null) { }
-		public Reactive(IEqualityComparer<TKey> keyComparer) : this(0, keyComparer, null) { }
-		public Reactive(EqualityComparer<TValue> valueComparer) : this(0, null, valueComparer) { }
-		public Reactive(IEqualityComparer<TKey> keyComparer, EqualityComparer<TValue> valueComparer) : this(0, keyComparer, valueComparer) { }
+		public ReactiveMap() : this(0, null, null) { }
+		public ReactiveMap(IEqualityComparer<TKey> keyComparer) : this(0, keyComparer, null) { }
+		public ReactiveMap(EqualityComparer<TValue> valueComparer) : this(0, null, valueComparer) { }
+		public ReactiveMap(IEqualityComparer<TKey> keyComparer, EqualityComparer<TValue> valueComparer) : this(0, keyComparer, valueComparer) { }
 
-		public Reactive(int capacity, IEqualityComparer<TKey> keyComparer = null, EqualityComparer<TValue> valueComparer = null)
+		public ReactiveMap(int capacity, IEqualityComparer<TKey> keyComparer = null, EqualityComparer<TValue> valueComparer = null)
 		{
 			map = new Dictionary<TKey, TValue>(capacity, keyComparer);
 			this.valueComparer = valueComparer ?? EqualityComparer<TValue>.Default;
@@ -159,7 +159,7 @@ namespace ReactiveObjects
 
 		private class ReactiveKey : IReadOnlyReactive<TValue>, IReadWriteReactive<TValue>
 		{
-			private readonly Reactive<TKey, TValue> map;
+			private readonly ReactiveMap<TKey, TValue> map;
 			private readonly TKey key;
 
 			public TValue Value
@@ -168,7 +168,7 @@ namespace ReactiveObjects
 				set => map[key] = value;
 			}
 
-			public ReactiveKey(Reactive<TKey, TValue> map, TKey key)
+			public ReactiveKey(ReactiveMap<TKey, TValue> map, TKey key)
 			{
 				this.map = map;
 				this.key = key;

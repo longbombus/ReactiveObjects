@@ -28,48 +28,11 @@ namespace ReactiveObjects
 		void Forget(Action<TValue> listener);
 	}
 
-	/// <summary> Interface of listenable key-value collection. </summary>
-	public interface IReactive<TKey, out TValue> : IReactive
-	{
-		/// <summary> Subscribes on any value change of any key. </summary>
-		/// <param name="listener"> Reaction on value change of some key. </param>
-		void Listen(Action<TKey, TValue> listener);
-
-		/// <summary> Unsubscribes from any value change of any key. </summary>
-		/// <param name="listener"> Reaction on value change of some key that you used to subscribe. </param>
-		void Forget(Action<TKey, TValue> listener);
-
-		/// <summary> Subscribes on change of specific key. </summary>
-		/// <param name="key"> Key of change to react on. </param>
-		/// <param name="listener"> Reaction on change of specific key. </param>
-		void Listen(TKey key, Action listener);
-
-		/// <summary> Unsubscribes from change of specific key. </summary>
-		/// <param name="key"> Key of change to stop reacting on. </param>
-		/// <param name="listener"> Reaction on change of specific key that you used to subscribe. </param>
-		void Forget(TKey key, Action listener);
-		
-		/// <summary> Subscribes on value change of specific key. </summary>
-		/// <param name="key"> Key of change to react on. </param>
-		/// <param name="listener"> Reaction on value change of specific key. </param>
-		void Listen(TKey key, Action<TValue> listener);
-		
-		/// <summary> Unsubscribes from value change of specific key. </summary>
-		/// <param name="key"> Key of change to stop reacting on. </param>
-		/// <param name="listener"> Reaction on value change of specific key that you used to subscribe. </param>
-		void Forget(TKey key, Action<TValue> listener);
-	}
-
 	/// <summary> Interface of listenable value that can be only read. </summary>
 	public interface IReadOnlyReactive<out TValue> : IReactive<TValue>
 	{
 		/// <summary> Current value which changes you can subscribe on. </summary>
 		TValue Value { get; }
-	}
-
-	/// <summary> Interface of listenable key-value collection that can be only read. </summary>
-	public interface IReadOnlyReactive<TKey, TValue> : IReactive<TKey, TValue>, IReadOnlyDictionary<TKey, TValue>
-	{
 	}
 
 	/// <summary> Interface of listenable value that can be read and written. </summary>
@@ -79,8 +42,56 @@ namespace ReactiveObjects
 		TValue Value { get; set; }
 	}
 
-	/// <summary> Interface of listenable key-value collection that can be read and written. </summary>
-	public interface IReadWriteReactive<TKey, TValue> : IReactive<TKey, TValue>, IDictionary<TKey, TValue>
+	/// <summary> Interface of listenable key collection. </summary>
+	public interface IReactiveKey<in TKey> : IReactive
+	{
+		/// <summary> Subscribes on change of specific key. </summary>
+		/// <param name="key"> Key of change to react on. </param>
+		/// <param name="listener"> Reaction on change of specific key. </param>
+		void Listen(TKey key, Action listener);
+
+		/// <summary> Unsubscribes from change of specific key. </summary>
+		/// <param name="key"> Key of change to stop reacting on. </param>
+		/// <param name="listener"> Reaction on change of specific key that you used to subscribe. </param>
+		void Forget(TKey key, Action listener);
+	}
+
+	/// <summary> Interface of listenable key-value collection. </summary>
+	public interface IReactiveKey<in TKey, out TValue> : IReactive
+	{
+		/// <summary> Subscribes on value change of specific key. </summary>
+		/// <param name="key"> Key of change to react on. </param>
+		/// <param name="listener"> Reaction on value change of specific key. </param>
+		void Listen(TKey key, Action<TValue> listener);
+
+		/// <summary> Unsubscribes from value change of specific key. </summary>
+		/// <param name="key"> Key of change to stop reacting on. </param>
+		/// <param name="listener"> Reaction on value change of specific key that you used to subscribe. </param>
+		void Forget(TKey key, Action<TValue> listener);
+	}
+
+	/// <summary> Interface of listenable key-value collection. </summary>
+	public interface IReactivePair<out TKey, out TValue> : IReactive
+	{
+		/// <summary> Subscribes on any value change of any key. </summary>
+		/// <param name="listener"> Reaction on value change of some key. </param>
+		void Listen(Action<TKey, TValue> listener);
+
+		/// <summary> Unsubscribes from any value change of any key. </summary>
+		/// <param name="listener"> Reaction on value change of some key that you used to subscribe. </param>
+		void Forget(Action<TKey, TValue> listener);
+	}
+
+	public interface IReactiveCollection<TItem> : IReactivePair<TItem, bool>, IReactiveKey<TItem, bool>
+	{
+	}
+
+	public interface IReactiveMap<TKey, out TValue> : IReactivePair<TKey, TValue>, IReactiveKey<TKey, TValue>, IReactiveKey<TKey>
+	{
+	}
+
+	/// <summary> Interface of listenable key-value collection that can be only read. </summary>
+	public interface IReadOnlyReactiveMap<TKey, TValue> : IReactiveMap<TKey, TValue>, IReadOnlyDictionary<TKey, TValue>
 	{
 	}
 }

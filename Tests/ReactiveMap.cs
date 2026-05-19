@@ -8,14 +8,14 @@ namespace ReactiveObjects.Tests
 		[Test]
 		public void IndexerGet_WhenKeyMissing_ReturnsDefault()
 		{
-			var map = new Reactive<int, string>();
+			var map = new ReactiveMap<int, string>();
 			Assert.AreEqual(default(string), map[123]);
 		}
 
 		[Test]
 		public void Set_NewKey_InvokesChangeAndKeyValueListeners()
 		{
-			var map = new Reactive<int, int>();
+			var map = new ReactiveMap<int, int>();
 			var changeCalls = 0;
 			var keyValueCalls = 0;
 			(int key, int value) received = default;
@@ -33,7 +33,7 @@ namespace ReactiveObjects.Tests
 		[Test]
 		public void Set_SameValueForExistingKey_DoesNotInvokeListeners()
 		{
-			var map = new Reactive<int, int>();
+			var map = new ReactiveMap<int, int>();
 			map.Set(1, 10);
 
 			var changeCalls = 0;
@@ -51,7 +51,7 @@ namespace ReactiveObjects.Tests
 		[Test]
 		public void SetSilent_ChangesValueWithoutNotifications()
 		{
-			var map = new Reactive<int, int>();
+			var map = new ReactiveMap<int, int>();
 			var changeCalls = 0;
 			var keyValueCalls = 0;
 			map.Listen(() => changeCalls++);
@@ -67,7 +67,7 @@ namespace ReactiveObjects.Tests
 		[Test]
 		public void IndexerSet_DelegatesToSetAndNotifies()
 		{
-			var map = new Reactive<int, int>();
+			var map = new ReactiveMap<int, int>();
 			var calls = 0;
 			map.Listen(() => calls++);
 
@@ -80,7 +80,7 @@ namespace ReactiveObjects.Tests
 		[Test]
 		public void Listen_KeyedListeners_FireOnlyForThatKey()
 		{
-			var map = new Reactive<int, int>();
+			var map = new ReactiveMap<int, int>();
 			var keyedChangeCalls = 0;
 			var keyedValueCalls = 0;
 			int received = -1;
@@ -99,7 +99,7 @@ namespace ReactiveObjects.Tests
 		[Test]
 		public void Forget_KeyedListeners_StopReceivingNotifications()
 		{
-			var map = new Reactive<int, int>();
+			var map = new ReactiveMap<int, int>();
 			var changeCalls = 0;
 			var valueCalls = 0;
 			Action changeListener = () => changeCalls++;
@@ -120,7 +120,7 @@ namespace ReactiveObjects.Tests
 		[Test]
 		public void Remove_ExistingKey_InvokesListenersWithDefaultValue()
 		{
-			var map = new Reactive<int, string>();
+			var map = new ReactiveMap<int, string>();
 			map.Set(1, "A");
 
 			var keyValueCalls = 0;
@@ -138,7 +138,7 @@ namespace ReactiveObjects.Tests
 		[Test]
 		public void Remove_MissingKey_DoesNotNotifyAndReturnsFalse()
 		{
-			var map = new Reactive<int, int>();
+			var map = new ReactiveMap<int, int>();
 			var calls = 0;
 			map.Listen(() => calls++);
 
@@ -151,7 +151,7 @@ namespace ReactiveObjects.Tests
 		[Test]
 		public void Clear_NotifiesForEachExistingKey()
 		{
-			var map = new Reactive<int, int>();
+			var map = new ReactiveMap<int, int>();
 			map.Set(1, 1);
 			map.Set(2, 2);
 			map.Set(3, 3);
@@ -168,7 +168,7 @@ namespace ReactiveObjects.Tests
 		[Test]
 		public void Add_NotifiesListeners()
 		{
-			var map = new Reactive<int, int>();
+			var map = new ReactiveMap<int, int>();
 			var calls = 0;
 			map.Listen(() => calls++);
 

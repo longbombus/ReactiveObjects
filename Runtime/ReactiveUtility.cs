@@ -22,14 +22,14 @@ namespace ReactiveObjects
 		}
 
 		/// <summary> Subscribes on any value change of any key and immediately invokes listener. </summary>
-		public static void ListenNow<TKey, TValue>(this IReadOnlyReactive<TKey, TValue> reactive, Action listener)
+		public static void ListenNow<TKey, TValue>(this IReadOnlyReactiveMap<TKey, TValue> reactive, Action listener)
 		{
 			reactive.Listen(listener);
 			listener.InvokeSafe();
 		}
 
 		/// <summary> Subscribes on any value change of any key and immediately invokes listener with current key-value pairs. </summary>
-		public static void ListenNow<TKey, TValue>(this IReadOnlyReactive<TKey, TValue> reactive, Action<TKey, TValue> listener)
+		public static void ListenNow<TKey, TValue>(this IReadOnlyReactiveMap<TKey, TValue> reactive, Action<TKey, TValue> listener)
 		{
 			reactive.Listen(listener);
 			foreach (var (key, value) in reactive)
@@ -37,14 +37,14 @@ namespace ReactiveObjects
 		}
 
 		/// <summary> Subscribes on value change of specific key and immediately invokes listener. </summary>
-		public static void ListenNow<TKey, TValue>(this IReadOnlyReactive<TKey, TValue> reactive, TKey key, Action listener)
+		public static void ListenNow<TKey, TValue>(this IReadOnlyReactiveMap<TKey, TValue> reactive, TKey key, Action listener)
 		{
 			reactive.Listen(key, listener);
 			listener.InvokeSafe();
 		}
 
 		/// <summary> Subscribes on value change of specific key and immediately invokes listener with current value of that key. </summary>
-		public static void ListenNow<TKey, TValue>(this IReadOnlyReactive<TKey, TValue> reactive, TKey key, Action<TValue> listener)
+		public static void ListenNow<TKey, TValue>(this IReadOnlyReactiveMap<TKey, TValue> reactive, TKey key, Action<TValue> listener)
 		{
 			reactive.Listen(key, listener);
 			listener.InvokeSafe(reactive[key]);
@@ -66,16 +66,16 @@ namespace ReactiveObjects
 			return result;
 		}
 
-		/// <inheritdoc cref="ListenNow{TKey, TValue}(IReadOnlyReactive{TKey, TValue}, Action)"/>
-		public static Reaction ReactNow<TKey, TValue>(this IReadOnlyReactive<TKey, TValue> reactive, Action listener)
+		/// <inheritdoc cref="ListenNow{TKey, TValue}(IReadOnlyReactiveMap{TKey,TValue}, Action)"/>
+		public static Reaction ReactNow<TKey, TValue>(this IReadOnlyReactiveMap<TKey, TValue> reactive, Action listener)
 		{
 			var result = Reaction.Create(reactive, listener);
 			listener.InvokeSafe();
 			return result;
 		}
 
-		/// <inheritdoc cref="ListenNow{TKey, TValue}(IReadOnlyReactive{TKey, TValue}, Action{TKey, TValue})"/>
-		public static Reaction ReactNow<TKey, TValue>(this IReadOnlyReactive<TKey, TValue> reactive, Action<TKey, TValue> listener)
+		/// <inheritdoc cref="ListenNow{TKey, TValue}(IReadOnlyReactiveMap{TKey,TValue}, Action{TKey, TValue})"/>
+		public static Reaction ReactNow<TKey, TValue>(this IReadOnlyReactiveMap<TKey, TValue> reactive, Action<TKey, TValue> listener)
 		{
 			var result = Reaction.Create(reactive, listener);
 			foreach (var (key, value) in reactive)
@@ -83,16 +83,16 @@ namespace ReactiveObjects
 			return result;
 		}
 
-		/// <inheritdoc cref="ListenNow{TKey, TValue}(IReadOnlyReactive{TKey, TValue}, TKey, Action)"/>
-		public static Reaction ReactNow<TKey, TValue>(this IReadOnlyReactive<TKey, TValue> reactive, TKey key, Action listener)
+		/// <inheritdoc cref="ListenNow{TKey, TValue}(IReadOnlyReactiveMap{TKey,TValue}, TKey, Action)"/>
+		public static Reaction ReactNow<TKey, TValue>(this IReadOnlyReactiveMap<TKey, TValue> reactive, TKey key, Action listener)
 		{
 			var result = Reaction.Create(reactive, key, listener);
 			listener.InvokeSafe();
 			return result;
 		}
 
-		/// <inheritdoc cref="ListenNow{TKey, TValue}(IReadOnlyReactive{TKey, TValue}, TKey, Action{TValue})"/>
-		public static Reaction ReactNow<TKey, TValue>(this IReadOnlyReactive<TKey, TValue> reactive, TKey key, Action<TValue> listener)
+		/// <inheritdoc cref="ListenNow{TKey, TValue}(IReadOnlyReactiveMap{TKey,TValue}, TKey, Action{TValue})"/>
+		public static Reaction ReactNow<TKey, TValue>(this IReadOnlyReactiveMap<TKey, TValue> reactive, TKey key, Action<TValue> listener)
 		{
 			var result = Reaction.Create(reactive, key, listener);
 			listener.InvokeSafe(reactive[key]);
@@ -126,7 +126,7 @@ namespace ReactiveObjects
 		}
 
 		/// <summary> Subscribes on only single next change of any key. </summary>
-		public static Reaction ReactOnce<TKey, TValue>(IReactive<TKey, TValue> reactive, Action listener)
+		public static Reaction ReactOnce<TKey, TValue>(IReactiveMap<TKey, TValue> reactive, Action listener)
 		{
 			return Reaction.Create(reactive, Wrapper);
 			void Wrapper(TKey key, TValue value)
@@ -137,7 +137,7 @@ namespace ReactiveObjects
 		}
 
 		/// <summary> Subscribes on only single next value change of any key. </summary>
-		public static Reaction ReactOnce<TKey, TValue>(IReactive<TKey, TValue> reactive, Action<TKey, TValue> listener)
+		public static Reaction ReactOnce<TKey, TValue>(IReactiveMap<TKey, TValue> reactive, Action<TKey, TValue> listener)
 		{
 			return Reaction.Create(reactive, Wrapper);
 			void Wrapper(TKey key, TValue value)
@@ -148,7 +148,7 @@ namespace ReactiveObjects
 		}
 
 		/// <summary> Subscribes on only single next change of specific key. </summary>
-		public static Reaction ReactOnce<TKey, TValue>(this IReadOnlyReactive<TKey, TValue> reactive, TKey key, Action listener)
+		public static Reaction ReactOnce<TKey, TValue>(this IReadOnlyReactiveMap<TKey, TValue> reactive, TKey key, Action listener)
 		{
 			return Reaction.Create(reactive, key, Wrapper);
 			void Wrapper()
@@ -159,7 +159,7 @@ namespace ReactiveObjects
 		}
 
 		/// <summary> Subscribes on only single next value change of specific key. </summary>
-		public static Reaction ReactOnce<TKey, TValue>(this IReadOnlyReactive<TKey, TValue> reactive, TKey key, Action<TValue> listener)
+		public static Reaction ReactOnce<TKey, TValue>(this IReadOnlyReactiveMap<TKey, TValue> reactive, TKey key, Action<TValue> listener)
 		{
 			return Reaction.Create(reactive, key, Wrapper);
 			void Wrapper(TValue value)

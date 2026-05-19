@@ -39,19 +39,19 @@ namespace ReactiveObjects
 			return new Reaction(() => reactive.Forget(listener));
 		}
 
-		public static Reaction Create<TKey, TValue>(IReactive<TKey, TValue> reactive, Action<TKey, TValue> listener)
+		public static Reaction Create<TKey, TValue>(IReactivePair<TKey, TValue> reactive, Action<TKey, TValue> listener)
 		{
 			reactive.Listen(listener);
 			return new Reaction(() => reactive.Forget(listener));
 		}
 
-		public static Reaction Create<TKey, TValue>(IReactive<TKey, TValue> reactive, TKey key, Action listener)
+		public static Reaction Create<TKey>(IReactiveKey<TKey> reactive, TKey key, Action listener)
 		{
 			reactive.Listen(key, listener);
 			return new Reaction(() => reactive.Forget(key, listener));
 		}
 
-		public static Reaction Create<TKey, TValue>(IReactive<TKey, TValue> reactive, TKey key, Action<TValue> listener)
+		public static Reaction Create<TKey, TValue>(IReactiveKey<TKey, TValue> reactive, TKey key, Action<TValue> listener)
 		{
 			reactive.Listen(key, listener);
 			return new Reaction(() => reactive.Forget(key, listener));
