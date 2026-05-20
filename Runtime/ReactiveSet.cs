@@ -6,9 +6,9 @@ using System.Collections.Generic;
 namespace ReactiveObjects
 {
 	public class ReactiveSet<TItem>
-		: ISet<TItem>
+		: IReadOnlyReactiveSet<TItem>
 		, IReadOnlyCollection<TItem>
-		, IReactiveCollection<TItem>
+		, ISet<TItem>
 	{
 		private readonly HashSet<TItem> set;
 		private readonly EqualityComparer<TItem> valueComparer;

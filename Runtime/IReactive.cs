@@ -82,16 +82,26 @@ namespace ReactiveObjects
 		void Forget(Action<TKey, TValue> listener);
 	}
 
-	public interface IReactiveCollection<TItem> : IReactivePair<TItem, bool>, IReactiveKey<TItem, bool>
+	public interface IReadOnlyReactiveList<out TItem>
+		: IReactivePair<int, TItem>
+		, IReadOnlyList<TItem>
 	{
 	}
 
-	public interface IReactiveMap<TKey, out TValue> : IReactivePair<TKey, TValue>, IReactiveKey<TKey, TValue>, IReactiveKey<TKey>
+	public interface IReadOnlyReactiveSet<TItem>
+		: IReactivePair<TItem, bool>
+		, IReactiveKey<TItem, bool>
+		, IReadOnlyCollection<TItem>
 	{
+		bool Contains(TItem item);
 	}
 
 	/// <summary> Interface of listenable key-value collection that can be only read. </summary>
-	public interface IReadOnlyReactiveMap<TKey, TValue> : IReactiveMap<TKey, TValue>, IReadOnlyDictionary<TKey, TValue>
+	public interface IReadOnlyReactiveMap<TKey, TValue>
+		: IReactivePair<TKey, TValue>
+		, IReactiveKey<TKey, TValue>
+		, IReactiveKey<TKey>
+		, IReadOnlyDictionary<TKey, TValue>
 	{
 	}
 }

@@ -115,7 +115,7 @@ namespace ReactiveObjects
 		}
 
 		/// <summary> Subscribes on only single next value change. </summary>
-		public static Reaction ReactOnce<TValue>(this IReadOnlyReactive<TValue> reactive, Action<TValue> listener)
+		public static Reaction ReactOnce<TValue>(this IReactive<TValue> reactive, Action<TValue> listener)
 		{
 			return Reaction.Create(reactive, Wrapper);
 			void Wrapper(TValue value)
@@ -125,30 +125,8 @@ namespace ReactiveObjects
 			}
 		}
 
-		/// <summary> Subscribes on only single next change of any key. </summary>
-		public static Reaction ReactOnce<TKey, TValue>(IReactiveMap<TKey, TValue> reactive, Action listener)
-		{
-			return Reaction.Create(reactive, Wrapper);
-			void Wrapper(TKey key, TValue value)
-			{
-				reactive.Forget(Wrapper);
-				listener.InvokeSafe();
-			}
-		}
-
-		/// <summary> Subscribes on only single next value change of any key. </summary>
-		public static Reaction ReactOnce<TKey, TValue>(IReactiveMap<TKey, TValue> reactive, Action<TKey, TValue> listener)
-		{
-			return Reaction.Create(reactive, Wrapper);
-			void Wrapper(TKey key, TValue value)
-			{
-				reactive.Forget(Wrapper);
-				listener.InvokeSafe(key, value);
-			}
-		}
-
 		/// <summary> Subscribes on only single next change of specific key. </summary>
-		public static Reaction ReactOnce<TKey, TValue>(this IReadOnlyReactiveMap<TKey, TValue> reactive, TKey key, Action listener)
+		public static Reaction ReactOnce<TKey>(this IReactiveKey<TKey> reactive, TKey key, Action listener)
 		{
 			return Reaction.Create(reactive, key, Wrapper);
 			void Wrapper()
@@ -159,13 +137,24 @@ namespace ReactiveObjects
 		}
 
 		/// <summary> Subscribes on only single next value change of specific key. </summary>
-		public static Reaction ReactOnce<TKey, TValue>(this IReadOnlyReactiveMap<TKey, TValue> reactive, TKey key, Action<TValue> listener)
+		public static Reaction ReactOnce<TKey, TValue>(this IReactiveKey<TKey, TValue> reactive, TKey key, Action<TValue> listener)
 		{
 			return Reaction.Create(reactive, key, Wrapper);
 			void Wrapper(TValue value)
 			{
 				reactive.Forget(key, Wrapper);
 				listener.InvokeSafe(value);
+			}
+		}
+
+		/// <summary> Subscribes on only single next value change of any key. </summary>
+		public static Reaction ReactOnce<TKey, TValue>(IReactivePair<TKey, TValue> reactive, Action<TKey, TValue> listener)
+		{
+			return Reaction.Create(reactive, Wrapper);
+			void Wrapper(TKey key, TValue value)
+			{
+				reactive.Forget(Wrapper);
+				listener.InvokeSafe(key, value);
 			}
 		}
 
