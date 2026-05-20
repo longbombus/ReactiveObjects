@@ -7,11 +7,9 @@ namespace ReactiveObjects
 {
 	public class ReactiveSet<TItem>
 		: IReadOnlyReactiveSet<TItem>
-		, IReadOnlyCollection<TItem>
 		, ISet<TItem>
 	{
 		private readonly HashSet<TItem> set;
-		private readonly EqualityComparer<TItem> valueComparer;
 
 		private List<Action> changeListeners;
 		private List<Action<TItem, bool>> containListeners;
@@ -20,6 +18,13 @@ namespace ReactiveObjects
 		public int Count => set.Count;
 
 		bool ICollection<TItem>.IsReadOnly => ((ICollection<TItem>)set).IsReadOnly;
+
+		public ReactiveSet() : this(0, null) { }
+		public ReactiveSet(EqualityComparer<TItem> itemComparer) : this(0, itemComparer) { }
+		public ReactiveSet(int capacity, EqualityComparer<TItem> itemComparer = null)
+		{
+			set = new HashSet<TItem>(capacity, itemComparer);
+		}
 
 		public void Listen(Action listener)
 			=> ListenersUtility.AddListener(ref changeListeners, listener);
@@ -80,7 +85,7 @@ namespace ReactiveObjects
 			if (set.Count == 0)
 				return;
 
-			var otherSet = other as HashSet<TItem> ?? new HashSet<TItem>(other, valueComparer);
+			var otherSet = other as HashSet<TItem> ?? new HashSet<TItem>(other, set.Comparer);
 
 			foreach (var element in set)
 				if (!otherSet.Contains(element))
