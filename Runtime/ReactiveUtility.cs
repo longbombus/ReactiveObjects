@@ -77,7 +77,7 @@ namespace ReactiveObjects
 		}
 
 		/// <inheritdoc cref="ListenNow{TKey, TValue}(IReadOnlyReactiveMap{TKey,TValue}, Action)"/>
-		public static Reaction ReactNow<TItem, TCollection>(this TCollection reactive, Action<TItem, bool> listener)
+		public static Reaction ReactNow<TCollection, TItem>(this TCollection reactive, Action<TItem, bool> listener)
 			where TCollection : IReadOnlyReactiveSet<TItem>
 		{
 			var result = Reaction.Create(reactive, listener);
