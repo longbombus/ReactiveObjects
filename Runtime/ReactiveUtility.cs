@@ -67,15 +67,28 @@ namespace ReactiveObjects
 		}
 
 		/// <inheritdoc cref="ListenNow{TKey, TValue}(IReadOnlyReactiveMap{TKey,TValue}, Action)"/>
-		public static Reaction ReactNow<TKey, TValue>(this IReadOnlyReactiveMap<TKey, TValue> reactive, Action listener)
+		public static Reaction ReactNow<TCollection, TItem>(this TCollection reactive, Action<int, TItem> listener)
+			where TCollection : IReadOnlyReactiveList<TItem>
 		{
 			var result = Reaction.Create(reactive, listener);
-			listener.InvokeSafe();
+			for (int i = 0; i < reactive.Count; ++i)
+				listener.InvokeSafe(i, reactive[i]);
+			return result;
+		}
+
+		/// <inheritdoc cref="ListenNow{TKey, TValue}(IReadOnlyReactiveMap{TKey,TValue}, Action)"/>
+		public static Reaction ReactNow<TItem, TCollection>(this TCollection reactive, Action<TItem, bool> listener)
+			where TCollection : IReadOnlyReactiveSet<TItem>
+		{
+			var result = Reaction.Create(reactive, listener);
+			foreach (var item in reactive)
+				listener.InvokeSafe(item, true);
 			return result;
 		}
 
 		/// <inheritdoc cref="ListenNow{TKey, TValue}(IReadOnlyReactiveMap{TKey,TValue}, Action{TKey, TValue})"/>
-		public static Reaction ReactNow<TKey, TValue>(this IReadOnlyReactiveMap<TKey, TValue> reactive, Action<TKey, TValue> listener)
+		public static Reaction ReactNow<TCollection, TKey, TValue>(this TCollection reactive, Action<TKey, TValue> listener)
+			where TCollection : IReadOnlyReactiveMap<TKey, TValue>
 		{
 			var result = Reaction.Create(reactive, listener);
 			foreach (var (key, value) in reactive)
@@ -84,7 +97,8 @@ namespace ReactiveObjects
 		}
 
 		/// <inheritdoc cref="ListenNow{TKey, TValue}(IReadOnlyReactiveMap{TKey,TValue}, TKey, Action)"/>
-		public static Reaction ReactNow<TKey, TValue>(this IReadOnlyReactiveMap<TKey, TValue> reactive, TKey key, Action listener)
+		public static Reaction ReactNow<TCollection, TKey, TValue>(this TCollection reactive, TKey key, Action listener)
+			 where TCollection : IReadOnlyReactiveMap<TKey, TValue>
 		{
 			var result = Reaction.Create(reactive, key, listener);
 			listener.InvokeSafe();
@@ -92,7 +106,8 @@ namespace ReactiveObjects
 		}
 
 		/// <inheritdoc cref="ListenNow{TKey, TValue}(IReadOnlyReactiveMap{TKey,TValue}, TKey, Action{TValue})"/>
-		public static Reaction ReactNow<TKey, TValue>(this IReadOnlyReactiveMap<TKey, TValue> reactive, TKey key, Action<TValue> listener)
+		public static Reaction ReactNow<TCollection, TKey, TValue>(this TCollection reactive, TKey key, Action<TValue> listener)
+			where TCollection : IReadOnlyReactiveMap<TKey, TValue>
 		{
 			var result = Reaction.Create(reactive, key, listener);
 			listener.InvokeSafe(reactive[key]);
