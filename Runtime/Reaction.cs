@@ -13,10 +13,10 @@ namespace ReactiveObjects
 			=> this.forget = forget;
 
 		public void Forget()
-			=> forget();
+			=> forget?.Invoke();
 
 		void IDisposable.Dispose()
-			=> forget();
+			=> Forget();
 
 		public bool Equals(Reaction other)
 			=> Equals(this.forget, other.forget);
