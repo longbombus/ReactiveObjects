@@ -74,11 +74,25 @@ namespace ReactiveObjects
 			ListenersUtility.InvokeAllSafe(changeListeners);
 		}
 
+		public void Add(TItem item, int count)
+		{
+			var wasCount = list.Count;
+			for (int i = 0; i < count; ++i)
+				list.Add(item);
+
+			if (list.Count == wasCount)
+				return;
+
+			NotifyIndicesPositive(wasCount);
+			ListenersUtility.InvokeAllSafe(changeListeners);
+		}
+
 		public void AddRange(IEnumerable<TItem> items)
 		{
 			var wasCount = list.Count;
 			list.AddRange(items);
 			NotifyIndicesPositive(wasCount);
+			ListenersUtility.InvokeAllSafe(changeListeners);
 		}
 
 		public void Insert(int index, TItem item)
