@@ -5,7 +5,7 @@ namespace ReactiveObjects
 {
 	public static class ReactiveUtility
 	{
-		#region Now
+		#region ListenNow
 
 		/// <summary> Subscribes on change and immediately invokes listener. </summary>
 		public static void ListenNow(this IReactive reactive, Action listener)
@@ -50,7 +50,56 @@ namespace ReactiveObjects
 			listener.InvokeSafe(reactive[key]);
 		}
 
+		#endregion
+
+		#region React
+
+		/// <inheritdoc cref="IReactive.Listen(Action)"/>
+		/// <returns> Disposable subscruption handle. </returns>
+		public static Reaction React(this IReactive reactive, Action listener)
+			=> Reaction.Create(reactive, listener);
+
+		/// <inheritdoc cref="IReactive{TValue}.Listen(Action{TValue})"/>
+		/// <inheritdoc cref="React(IReactive, Action)"/>
+		public static Reaction React<TValue>(this IReadOnlyReactive<TValue> reactive, Action<TValue> listener)
+			=> Reaction.Create(reactive, listener);
+
+		/// <inheritdoc cref="IReactivePair{TKey, TValue}.Listen(Action{TKey, TValue})"/>
+		/// <inheritdoc cref="React(IReactive, Action)"/>
+		public static Reaction React<TCollection, TItem>(this TCollection reactive, Action<int, TItem> listener)
+			where TCollection : IReadOnlyReactiveList<TItem>
+			=> Reaction.Create(reactive, listener);
+
+		/// <inheritdoc cref="IReactivePair{TKey, TValue}.Listen(Action{TKey, TValue})"/>
+		/// <inheritdoc cref="React(IReactive, Action)"/>
+		public static Reaction React<TCollection, TItem>(this TCollection reactive, Action<TItem, bool> listener)
+			where TCollection : IReadOnlyReactiveSet<TItem>
+			=> Reaction.Create(reactive, listener);
+
+		/// <inheritdoc cref="IReactivePair{TKey, TValue}.Listen(Action{TKey, TValue})"/>
+		/// <inheritdoc cref="React(IReactive, Action)"/>
+		public static Reaction React<TCollection, TKey, TValue>(this TCollection reactive, Action<TKey, TValue> listener)
+			where TCollection : IReadOnlyReactiveMap<TKey, TValue>
+			=> Reaction.Create(reactive, listener);
+
+		/// <inheritdoc cref="IReactiveKey{TKey}.Listen(TKey, Action)"/>
+		/// <inheritdoc cref="React(IReactive, Action)"/>
+		public static Reaction React<TCollection, TKey, TValue>(this TCollection reactive, TKey key, Action listener)
+			 where TCollection : IReadOnlyReactiveMap<TKey, TValue>
+			=> Reaction.Create(reactive, key, listener);
+
+		/// <inheritdoc cref="IReactiveKey{TKey, TValue}.Listen(TKey, Action{TValue})"/>
+		/// <inheritdoc cref="React(IReactive, Action)"/>
+		public static Reaction React<TCollection, TKey, TValue>(this TCollection reactive, TKey key, Action<TValue> listener)
+			where TCollection : IReadOnlyReactiveMap<TKey, TValue>
+			=> Reaction.Create(reactive, key, listener);
+
+		#endregion
+
+		#region ReactNow
+
 		/// <inheritdoc cref="ListenNow(IReactive, Action)"/>
+		/// <inheritdoc cref="React(IReactive, Action)"/>
 		public static Reaction ReactNow(this IReactive reactive, Action listener)
 		{
 			var result = Reaction.Create(reactive, listener);
@@ -59,6 +108,7 @@ namespace ReactiveObjects
 		}
 
 		/// <inheritdoc cref="ListenNow{TValue}(IReadOnlyReactive{TValue}, Action{TValue})"/>
+		/// <inheritdoc cref="React(IReactive, Action)"/>
 		public static Reaction ReactNow<TValue>(this IReadOnlyReactive<TValue> reactive, Action<TValue> listener)
 		{
 			var result = Reaction.Create(reactive, listener);
@@ -67,6 +117,7 @@ namespace ReactiveObjects
 		}
 
 		/// <inheritdoc cref="ListenNow{TKey, TValue}(IReadOnlyReactiveMap{TKey,TValue}, Action)"/>
+		/// <inheritdoc cref="React(IReactive, Action)"/>
 		public static Reaction ReactNow<TCollection, TItem>(this TCollection reactive, Action<int, TItem> listener)
 			where TCollection : IReadOnlyReactiveList<TItem>
 		{
@@ -77,6 +128,7 @@ namespace ReactiveObjects
 		}
 
 		/// <inheritdoc cref="ListenNow{TKey, TValue}(IReadOnlyReactiveMap{TKey,TValue}, Action)"/>
+		/// <inheritdoc cref="React(IReactive, Action)"/>
 		public static Reaction ReactNow<TCollection, TItem>(this TCollection reactive, Action<TItem, bool> listener)
 			where TCollection : IReadOnlyReactiveSet<TItem>
 		{
@@ -87,6 +139,7 @@ namespace ReactiveObjects
 		}
 
 		/// <inheritdoc cref="ListenNow{TKey, TValue}(IReadOnlyReactiveMap{TKey,TValue}, Action{TKey, TValue})"/>
+		/// <inheritdoc cref="React(IReactive, Action)"/>
 		public static Reaction ReactNow<TCollection, TKey, TValue>(this TCollection reactive, Action<TKey, TValue> listener)
 			where TCollection : IReadOnlyReactiveMap<TKey, TValue>
 		{
@@ -97,6 +150,7 @@ namespace ReactiveObjects
 		}
 
 		/// <inheritdoc cref="ListenNow{TKey, TValue}(IReadOnlyReactiveMap{TKey,TValue}, TKey, Action)"/>
+		/// <inheritdoc cref="React(IReactive, Action)"/>
 		public static Reaction ReactNow<TCollection, TKey, TValue>(this TCollection reactive, TKey key, Action listener)
 			 where TCollection : IReadOnlyReactiveMap<TKey, TValue>
 		{
@@ -106,6 +160,7 @@ namespace ReactiveObjects
 		}
 
 		/// <inheritdoc cref="ListenNow{TKey, TValue}(IReadOnlyReactiveMap{TKey,TValue}, TKey, Action{TValue})"/>
+		/// <inheritdoc cref="React(IReactive, Action)"/>
 		public static Reaction ReactNow<TCollection, TKey, TValue>(this TCollection reactive, TKey key, Action<TValue> listener)
 			where TCollection : IReadOnlyReactiveMap<TKey, TValue>
 		{
@@ -116,9 +171,10 @@ namespace ReactiveObjects
 
 		#endregion
 
-		#region Once
+		#region ReactOnce
 
 		/// <summary> Subscribes on only single next change. </summary>
+		/// <inheritdoc cref="React(IReactive, Action)"/>
 		public static Reaction ReactOnce(this IReactive reactive, Action listener)
 		{
 			return Reaction.Create(reactive, Wrapper);
@@ -130,6 +186,7 @@ namespace ReactiveObjects
 		}
 
 		/// <summary> Subscribes on only single next value change. </summary>
+		/// <inheritdoc cref="React(IReactive, Action)"/>
 		public static Reaction ReactOnce<TValue>(this IReactive<TValue> reactive, Action<TValue> listener)
 		{
 			return Reaction.Create(reactive, Wrapper);
@@ -141,6 +198,7 @@ namespace ReactiveObjects
 		}
 
 		/// <summary> Subscribes on only single next change of specific key. </summary>
+		/// <inheritdoc cref="React(IReactive, Action)"/>
 		public static Reaction ReactOnce<TKey>(this IReactiveKey<TKey> reactive, TKey key, Action listener)
 		{
 			return Reaction.Create(reactive, key, Wrapper);
@@ -152,6 +210,7 @@ namespace ReactiveObjects
 		}
 
 		/// <summary> Subscribes on only single next value change of specific key. </summary>
+		/// <inheritdoc cref="React(IReactive, Action)"/>
 		public static Reaction ReactOnce<TKey, TValue>(this IReactiveKey<TKey, TValue> reactive, TKey key, Action<TValue> listener)
 		{
 			return Reaction.Create(reactive, key, Wrapper);
@@ -163,6 +222,7 @@ namespace ReactiveObjects
 		}
 
 		/// <summary> Subscribes on only single next value change of any key. </summary>
+		/// <inheritdoc cref="React(IReactive, Action)"/>
 		public static Reaction ReactOnce<TKey, TValue>(IReactivePair<TKey, TValue> reactive, Action<TKey, TValue> listener)
 		{
 			return Reaction.Create(reactive, Wrapper);
