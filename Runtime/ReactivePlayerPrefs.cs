@@ -6,8 +6,8 @@ using Unity.Scripting.LifecycleManagement;
 
 namespace ReactiveObjects
 {
-	[NoAutoStaticsCleanup]
-	public static class ReactivePlayerPrefs
+	[AutoStaticsCleanup]
+	public static partial class ReactivePlayerPrefs
 	{
 		internal static List<Action> ChangeListeners;
 
@@ -50,8 +50,8 @@ namespace ReactiveObjects
 			=> throw new NotSupportedException("TODO: Implement DeleteAll in ReactivePlayerPrefs");
 	}
 
-	[NoAutoStaticsCleanup]
-	public static class ReactivePlayerPrefs<T>
+	[AutoStaticsCleanup]
+	public static partial class ReactivePlayerPrefs<T>
 	{
 		public static ReactivePlayerPrefsStore<T> Store = new();
 
@@ -145,7 +145,7 @@ namespace ReactiveObjects
 		}
 	}
 
-	public class ReactivePlayerPref<T> : IReactive<T>
+	public class ReactivePlayerPref<T> : IReadWriteReactive<T>
 	{
 		private readonly string key;
 		private readonly T defaultValue;
