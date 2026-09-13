@@ -145,7 +145,9 @@ namespace ReactiveObjects
 		}
 	}
 
-	public class ReactivePlayerPref<T> : IReadWriteReactive<T>
+	public class ReactivePlayerPref<T>
+		: IReadOnlyReactive<T>
+		, IReadWriteReactive<T>
 	{
 		private readonly string key;
 		private readonly T defaultValue;
